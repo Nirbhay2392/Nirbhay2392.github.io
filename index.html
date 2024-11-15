@@ -47,8 +47,54 @@
             color: white;
         }
 
+        .builder-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .builder-tab {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .builder-tab.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .builder-tab.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .builder-tab.warning {
+            background: #ffc107;
+            color: black;
+        }
+
+        .builder-tab.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .builder-tab.inactive {
+            background: #6c757d;
+            color: white;
+        }
+
         .input-group {
             margin-bottom: 15px;
+            display: none;
+        }
+
+        .input-group.show {
+            display: block;
         }
 
         .duration-group {
@@ -92,30 +138,24 @@
             border-radius: 4px;
         }
 
-        .upgrade-card .title {
+        .cost {
+            color: #dc3545;
             font-weight: bold;
-            margin-bottom: 5px;
         }
 
-        .upgrade-card .info {
-            color: #666;
-            font-size: 0.9em;
+        .add-button {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 15px;
         }
 
-        .button-group {
-            margin-top: 10px;
+        .add-button:hover {
+            background: #218838;
         }
-
-        .button-group button {
-            width: auto;
-            margin-right: 5px;
-            padding: 5px 10px;
-            background: #6c757d;
-        }
-
-        .priority-high { color: #dc3545; }
-        .priority-medium { color: #ffc107; }
-        .priority-low { color: #28a745; }
 
         .tab-content {
             display: none;
@@ -124,6 +164,10 @@
         .tab-content.active {
             display: block;
         }
+
+        .priority-high { color: #dc3545; }
+        .priority-medium { color: #ffc107; }
+        .priority-low { color: #28a745; }
     </style>
 </head>
 <body>
@@ -143,7 +187,18 @@
         </div>
 
         <div id="builders" class="tab-content active">
-            <div class="input-group">
+            <div class="builder-tabs">
+                <div class="builder-tab" data-builder="1">Builder 1</div>
+                <div class="builder-tab" data-builder="2">Builder 2</div>
+                <div class="builder-tab" data-builder="3">Builder 3</div>
+                <div class="builder-tab" data-builder="4">Builder 4</div>
+                <div class="builder-tab" data-builder="5">Builder 5</div>
+                <div class="builder-tab" data-builder="6">Builder 6</div>
+            </div>
+            <div class="add-button" onclick="toggleBuilderInput()">
+                <i class="fas fa-plus"></i> Add Builder Upgrade
+            </div>
+            <div class="input-group" id="builderInputGroup">
                 <input type="text" id="builderName" placeholder="Upgrade Name (e.g., Town Hall)">
                 <div class="duration-group">
                     <div class="duration-input">
@@ -153,14 +208,19 @@
                         <input type="number" id="builderHours" placeholder="Hours" min="0" max="23">
                     </div>
                 </div>
-                <input type="number" id="builderNumber" placeholder="Builder Number (1-6)">
+                <input type="number" id="goldCost" placeholder="Gold Cost">
+                <input type="number" id="elixirCost" placeholder="Elixir Cost">
+                <input type="number" id="darkElixirCost" placeholder="Dark Elixir Cost">
                 <button onclick="addBuilderUpgrade()">Add Builder Upgrade</button>
             </div>
             <div id="builderUpgradesList"></div>
         </div>
 
         <div id="laboratory" class="tab-content">
-            <div class="input-group">
+            <div class="add-button" onclick="toggleLabInput()">
+                <i class="fas fa-plus"></i> Add Laboratory Research
+            </div>
+            <div class="input-group" id="labInputGroup">
                 <input type="text" id="labName" placeholder="Research Name (e.g., Barbarian)">
                 <div class="duration-group">
                     <div class="duration-input">
@@ -170,13 +230,18 @@
                         <input type="number" id="labHours" placeholder="Hours" min="0" max="23">
                     </div>
                 </div>
+                <input type="number" id="labElixirCost" placeholder="Elixir Cost">
+                <input type="number" id="labDarkElixirCost" placeholder="Dark Elixir Cost">
                 <button onclick="addLabUpgrade()">Add Laboratory Research</button>
             </div>
             <div id="labUpgradesList"></div>
         </div>
 
         <div id="planned" class="tab-content">
-            <div class="input-group">
+            <div class="add-button" onclick="togglePlannedInput()">
+                <i class="fas fa-plus"></i> Add Planned Upgrade
+            </div>
+            <div class="input-group" id="plannedInputGroup">
                 <input type="text" id="plannedName" placeholder="Upgrade Name">
                 <select id="plannedType">
                     <option value="builder">Builder Upgrade</option>
@@ -190,15 +255,14 @@
                         <input type="number" id="plannedHours" placeholder="Hours" min="0" max="23">
                     </div>
                 </div>
-                <input type="number" id="plannedBuilder" placeholder="Builder Number (if builder upgrade)">
                 <select id="plannedPriority">
                     <option value="high">High Priority</option>
                     <option value="medium">Medium Priority</option>
                     <option value="low">Low Priority</option>
                 </select>
-                <input type="number" id="goldCost" placeholder="Gold Cost">
-                <input type="number" id="elixirCost" placeholder="Elixir Cost">
-                <input type="number" id="darkElixirCost" placeholder="Dark Elixir Cost">
+                <input type="number" id="plannedGoldCost" placeholder="Gold Cost">
+                <input type="number" id="plannedElixirCost" placeholder="Elixir Cost">
+                <input type="number" id="plannedDarkElixirCost" placeholder="Dark Elixir Cost">
                 <button onclick="addPlannedUpgrade()">Add to Plan</button>
             </div>
             <div id="plannedUpgradesList"></div>
@@ -211,6 +275,18 @@
         let labUpgrades = JSON.parse(localStorage.getItem('labUpgrades') || '[]');
         let plannedUpgrades = JSON.parse(localStorage.getItem('plannedUpgrades') || '[]');
 
+        function toggleBuilderInput() {
+            document.getElementById('builderInputGroup').classList.toggle('show');
+        }
+
+        function toggleLabInput() {
+            document.getElementById('labInputGroup').classList.toggle('show');
+        }
+
+        function togglePlannedInput() {
+            document.getElementById('plannedInputGroup').classList.toggle('show');
+        }
+
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -220,6 +296,65 @@
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
+
+        function formatCost(cost) {
+            if (!cost) return '';
+            cost = parseInt(cost);
+            if (cost >= 1000000) {
+                return (cost / 1000000).toFixed(1) + 'M';
+            } else if (cost >= 1000) {
+                return (cost / 1000).toFixed(1) + 'K';
+            }
+            return cost.toString();
+        }
+
+        function formatEndTime(date) {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+            const timeString = date.toLocaleTimeString('en-US', options);
+            
+            if (date.toDateString() === now.toDateString()) {
+                return `Today ${timeString}`;
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                return `Tomorrow ${timeString}`;
+            } else {
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: 'numeric',
+                    hour12: true 
+                });
+            }
+        }
+
+        function getTimeStatus(endTime) {
+            const remaining = new Date(endTime) - new Date();
+            const hours = remaining / (1000 * 60 * 60);
+            
+            if (remaining <= 0) return 'completed';
+            if (hours <= 3) return 'warning';
+            return 'danger';
+        }
+
+        function updateBuilderTabs() {
+            const builderTabs = document.querySelectorAll('.builder-tab');
+            builderTabs.forEach((tab, index) => {
+                const builder = index + 1;
+                const upgrade = builderUpgrades.find(u => u.builder === builder.toString());
+                
+                tab.className = 'builder-tab';
+                if (upgrade) {
+                    const status = getTimeStatus(upgrade.endTime);
+                    tab.classList.add(status);
+                } else {
+                    tab.classList.add('inactive');
+                }
+            });
+        }
 
         function saveToLocalStorage() {
             localStorage.setItem('builderUpgrades', JSON.stringify(builderUpgrades));
@@ -231,30 +366,30 @@
             return (parseInt(days || 0) * 24) + parseInt(hours || 0);
         }
 
-        function formatTimeRemaining(total) {
-            const days = Math.floor(total / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
-            
-            let result = '';
-            if (days > 0) result += `${days}d `;
-            if (hours > 0) result += `${hours}h `;
-            result += `${minutes}m`;
-            return result;
-        }
-
-        function getTimeRemaining(endTime) {
-            const total = new Date(endTime) - new Date();
-            return formatTimeRemaining(total);
-        }
-
         function addBuilderUpgrade() {
             const name = document.getElementById('builderName').value;
             const days = document.getElementById('builderDays').value;
             const hours = document.getElementById('builderHours').value;
-            const builder = document.getElementById('builderNumber').value;
+            const goldCost = document.getElementById('goldCost').value;
+            const elixirCost = document.getElementById('elixirCost').value;
+            const darkElixirCost = document.getElementById('darkElixirCost').value;
 
-            if (!name || (!days && !hours) || !builder) {
+            // Find first available builder
+            const usedBuilders = builderUpgrades.map(u => parseInt(u.builder));
+            let builder = null;
+            for (let i = 1; i <= 6; i++) {
+                if (!usedBuilders.includes(i)) {
+                    builder = i;
+                    break;
+                }
+            }
+
+            if (!builder) {
+                alert('No builders available!');
+                return;
+            }
+
+            if (!name || (!days && !hours)) {
                 alert('Please fill in all required fields');
                 return;
             }
@@ -267,29 +402,43 @@
                 id: Date.now(),
                 name,
                 duration: totalHours,
-                builder,
+                builder: builder.toString(),
                 startTime,
                 endTime,
-                notificationsEnabled: true
+                goldCost,
+                elixirCost,
+                darkElixirCost
             });
 
             builderUpgrades.sort((a, b) => new Date(a.endTime) - new Date(b.endTime));
             saveToLocalStorage();
             renderBuilderUpgrades();
+            updateBuilderTabs();
             
+            // Clear inputs and hide form
             document.getElementById('builderName').value = '';
             document.getElementById('builderDays').value = '';
             document.getElementById('builderHours').value = '';
-            document.getElementById('builderNumber').value = '';
+            document.getElementById('goldCost').value = '';
+            document.getElementById('elixirCost').value = '';
+            document.getElementById('darkElixirCost').value = '';
+            document.getElementById('builderInputGroup').classList.remove('show');
         }
 
-        function addLabUpgrade() {
+       function addLabUpgrade() {
             const name = document.getElementById('labName').value;
             const days = document.getElementById('labDays').value;
             const hours = document.getElementById('labHours').value;
+            const elixirCost = document.getElementById('labElixirCost').value;
+            const darkElixirCost = document.getElementById('labDarkElixirCost').value;
 
             if (!name || (!days && !hours)) {
                 alert('Please fill in all required fields');
+                return;
+            }
+
+            if (labUpgrades.length > 0) {
+                alert('Laboratory can only research one upgrade at a time!');
                 return;
             }
 
@@ -303,16 +452,20 @@
                 duration: totalHours,
                 startTime,
                 endTime,
-                notificationsEnabled: true
+                elixirCost,
+                darkElixirCost
             });
 
-            labUpgrades.sort((a, b) => new Date(a.endTime) - new Date(b.endTime));
             saveToLocalStorage();
             renderLabUpgrades();
-            
+
+            // Clear inputs and hide form
             document.getElementById('labName').value = '';
             document.getElementById('labDays').value = '';
             document.getElementById('labHours').value = '';
+            document.getElementById('labElixirCost').value = '';
+            document.getElementById('labDarkElixirCost').value = '';
+            document.getElementById('labInputGroup').classList.remove('show');
         }
 
         function addPlannedUpgrade() {
@@ -320,14 +473,13 @@
             const type = document.getElementById('plannedType').value;
             const days = document.getElementById('plannedDays').value;
             const hours = document.getElementById('plannedHours').value;
-            const builder = document.getElementById('plannedBuilder').value;
             const priority = document.getElementById('plannedPriority').value;
-            const goldCost = document.getElementById('goldCost').value;
-            const elixirCost = document.getElementById('elixirCost').value;
-            const darkElixirCost = document.getElementById('darkElixirCost').value;
+            const goldCost = document.getElementById('plannedGoldCost').value;
+            const elixirCost = document.getElementById('plannedElixirCost').value;
+            const darkElixirCost = document.getElementById('plannedDarkElixirCost').value;
 
             if (!name || (!days && !hours)) {
-                alert('Please fill in at least the name and duration');
+                alert('Please fill in all required fields');
                 return;
             }
 
@@ -338,130 +490,139 @@
                 name,
                 type,
                 duration: totalHours,
-                builder,
                 priority,
                 goldCost,
                 elixirCost,
                 darkElixirCost
             });
 
+            plannedUpgrades.sort((a, b) => {
+                const priorityOrder = { high: 0, medium: 1, low: 2 };
+                return priorityOrder[a.priority] - priorityOrder[b.priority];
+            });
+
             saveToLocalStorage();
             renderPlannedUpgrades();
-            
+
+            // Clear inputs and hide form
             document.getElementById('plannedName').value = '';
             document.getElementById('plannedDays').value = '';
             document.getElementById('plannedHours').value = '';
-            document.getElementById('plannedBuilder').value = '';
-            document.getElementById('goldCost').value = '';
-            document.getElementById('elixirCost').value = '';
-            document.getElementById('darkElixirCost').value = '';
+            document.getElementById('plannedGoldCost').value = '';
+            document.getElementById('plannedElixirCost').value = '';
+            document.getElementById('plannedDarkElixirCost').value = '';
+            document.getElementById('plannedInputGroup').classList.remove('show');
+        }
+
+        function removeBuilderUpgrade(id) {
+            builderUpgrades = builderUpgrades.filter(u => u.id !== id);
+            saveToLocalStorage();
+            renderBuilderUpgrades();
+            updateBuilderTabs();
+        }
+
+        function removeLabUpgrade(id) {
+            labUpgrades = labUpgrades.filter(u => u.id !== id);
+            saveToLocalStorage();
+            renderLabUpgrades();
+        }
+
+        function removePlannedUpgrade(id) {
+            plannedUpgrades = plannedUpgrades.filter(u => u.id !== id);
+            saveToLocalStorage();
+            renderPlannedUpgrades();
         }
 
         function renderBuilderUpgrades() {
-            const container = document.getElementById('builderUpgradesList');
-            container.innerHTML = builderUpgrades.map(upgrade => `
-                <div class="upgrade-card">
-                    <div class="title">${upgrade.name}</div>
-                    <div class="info">
-                        Builder ${upgrade.builder} • ${getTimeRemaining(upgrade.endTime)}
-                    </div>
-                    <div class="button-group">
-                        <button onclick="removeUpgrade('builder', ${upgrade.id})">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+            const list = document.getElementById('builderUpgradesList');
+            list.innerHTML = '';
+
+            builderUpgrades.forEach(upgrade => {
+                const card = document.createElement('div');
+                card.className = 'upgrade-card';
+                
+                const endTime = new Date(upgrade.endTime);
+                const status = getTimeStatus(endTime);
+                
+                let costs = [];
+                if (upgrade.goldCost) costs.push(`Gold: ${formatCost(upgrade.goldCost)}`);
+                if (upgrade.elixirCost) costs.push(`Elixir: ${formatCost(upgrade.elixirCost)}`);
+                if (upgrade.darkElixirCost) costs.push(`Dark Elixir: ${formatCost(upgrade.darkElixirCost)}`);
+                
+                card.innerHTML = `
+                    <h3>Builder ${upgrade.builder}: ${upgrade.name}</h3>
+                    <p>Completes: ${formatEndTime(endTime)}</p>
+                    ${costs.length ? `<p class="cost">${costs.join(' | ')}</p>` : ''}
+                    <button onclick="removeBuilderUpgrade(${upgrade.id})">Cancel Upgrade</button>
+                `;
+                
+                list.appendChild(card);
+            });
         }
 
         function renderLabUpgrades() {
-            const container = document.getElementById('labUpgradesList');
-            container.innerHTML = labUpgrades.map(upgrade => `
-                <div class="upgrade-card">
-                    <div class="title">${upgrade.name}</div>
-                    <div class="info">
-                        Completes in: ${getTimeRemaining(upgrade.endTime)}
-                    </div>
-                    <div class="button-group">
-                        <button onclick="removeUpgrade('lab', ${upgrade.id})">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+            const list = document.getElementById('labUpgradesList');
+            list.innerHTML = '';
+
+            labUpgrades.forEach(upgrade => {
+                const card = document.createElement('div');
+                card.className = 'upgrade-card';
+                
+                const endTime = new Date(upgrade.endTime);
+                const status = getTimeStatus(endTime);
+                
+                let costs = [];
+                if (upgrade.elixirCost) costs.push(`Elixir: ${formatCost(upgrade.elixirCost)}`);
+                if (upgrade.darkElixirCost) costs.push(`Dark Elixir: ${formatCost(upgrade.darkElixirCost)}`);
+                
+                card.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>Completes: ${formatEndTime(endTime)}</p>
+                    ${costs.length ? `<p class="cost">${costs.join(' | ')}</p>` : ''}
+                    <button onclick="removeLabUpgrade(${upgrade.id})">Cancel Research</button>
+                `;
+                
+                list.appendChild(card);
+            });
         }
 
         function renderPlannedUpgrades() {
-                const container = document.getElementById('plannedUpgradesList');
-                container.innerHTML = plannedUpgrades.map(upgrade => {
-                    const days = Math.floor(upgrade.duration / 24);
-                    const hours = upgrade.duration % 24;
-                    let durationText = '';
-                    if (days > 0) durationText += `${days}d `;
-                    if (hours > 0) durationText += `${hours}h`;
-                    
-                    return `
-                        <div class="upgrade-card">
-                            <div class="title">
-                                ${upgrade.name}
-                                <span class="priority-${upgrade.priority}">• ${upgrade.priority} priority</span>
-                            </div>
-                            <div class="info">
-                                ${upgrade.type === 'builder' ? 'Builder' : 'Laboratory'} • ${durationText}
-                                ${upgrade.goldCost ? `<br>Gold: ${upgrade.goldCost.toLocaleString()}` : ''}
-                                ${upgrade.elixirCost ? `<br>Elixir: ${upgrade.elixirCost.toLocaleString()}` : ''}
-                                ${upgrade.darkElixirCost ? `<br>Dark Elixir: ${upgrade.darkElixirCost.toLocaleString()}` : ''}
-                            </div>
-                            <div class="button-group">
-                                <button onclick="removeUpgrade('planned', ${upgrade.id})">
-                                    <i class="fas fa-trash"></i> Remove
-                                </button>
-                                <button onclick="startUpgrade('${upgrade.type}', ${upgrade.id})">
-                                    <i class="fas fa-play"></i> Start
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
+            const list = document.getElementById('plannedUpgradesList');
+            list.innerHTML = '';
 
-            function removeUpgrade(type, id) {
-                if (type === 'builder') {
-                    builderUpgrades = builderUpgrades.filter(u => u.id !== id);
-                    renderBuilderUpgrades();
-                } else if (type === 'lab') {
-                    labUpgrades = labUpgrades.filter(u => u.id !== id);
-                    renderLabUpgrades();
-                } else if (type === 'planned') {
-                    plannedUpgrades = plannedUpgrades.filter(u => u.id !== id);
-                    renderPlannedUpgrades();
-                }
-                saveToLocalStorage();
-            }
+            plannedUpgrades.forEach(upgrade => {
+                const card = document.createElement('div');
+                card.className = 'upgrade-card';
+                
+                let costs = [];
+                if (upgrade.goldCost) costs.push(`Gold: ${formatCost(upgrade.goldCost)}`);
+                if (upgrade.elixirCost) costs.push(`Elixir: ${formatCost(upgrade.elixirCost)}`);
+                if (upgrade.darkElixirCost) costs.push(`Dark Elixir: ${formatCost(upgrade.darkElixirCost)}`);
+                
+                card.innerHTML = `
+                    <h3 class="priority-${upgrade.priority}">${upgrade.name}</h3>
+                    <p>Type: ${upgrade.type === 'builder' ? 'Builder Upgrade' : 'Laboratory Research'}</p>
+                    <p>Duration: ${Math.floor(upgrade.duration/24)}d ${upgrade.duration%24}h</p>
+                    ${costs.length ? `<p class="cost">${costs.join(' | ')}</p>` : ''}
+                    <button onclick="removePlannedUpgrade(${upgrade.id})">Remove from Plan</button>
+                `;
+                
+                list.appendChild(card);
+            });
+        }
 
-            function startUpgrade(type, id) {
-                const planned = plannedUpgrades.find(u => u.id === id);
-                if (!planned) return;
-
-                if (type === 'builder') {
-                    addBuilderUpgrade();
-                } else if (type === 'lab') {
-                    addLabUpgrade();
-                }
-
-                removeUpgrade('planned', id);
-            }
-
-            // Initial render
+        // Update displays every minute
+        setInterval(() => {
             renderBuilderUpgrades();
             renderLabUpgrades();
-            renderPlannedUpgrades();
+            updateBuilderTabs();
+        }, 60000);
 
-            // Update times periodically
-            setInterval(() => {
-                renderBuilderUpgrades();
-                renderLabUpgrades();
-            }, 60000); // Update every minute
-        </script>
-    </body>
+        // Initial render
+        renderBuilderUpgrades();
+        renderLabUpgrades();
+        renderPlannedUpgrades();
+        updateBuilderTabs();
+    </script>
+</body>
 </html>
