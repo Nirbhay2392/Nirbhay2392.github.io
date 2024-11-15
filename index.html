@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Tracker</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .tab.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .duration-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .duration-input {
+            flex: 1;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        .upgrade-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .upgrade-card .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .upgrade-card .info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .button-group {
+            margin-top: 10px;
+        }
+
+        .button-group button {
+            width: auto;
+            margin-right: 5px;
+            padding: 5px 10px;
+            background: #6c757d;
+        }
+
+        .priority-high { color: #dc3545; }
+        .priority-medium { color: #ffc107; }
+        .priority-low { color: #28a745; }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Clash of Clans Upgrade Tracker</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="builders">
+                <i class="fas fa-hammer"></i> Builders
+            </div>
+            <div class="tab" data-tab="laboratory">
+                <i class="fas fa-flask"></i> Laboratory
+            </div>
+            <div class="tab" data-tab="planned">
+                <i class="fas fa-calendar"></i> Planned
+            </div>
+        </div>
+
+        <div id="builders" class="tab-content active">
+            <div class="input-group">
+                <input type="text" id="builderName" placeholder="Upgrade Name (e.g., Town Hall)">
+                <div class="duration-group">
+                    <div class="duration-input">
+                        <input type="number" id="builderDays" placeholder="Days" min="0">
+                    </div>
+                    <div class="duration-input">
+                        <input type="number" id="builderHours" placeholder="Hours" min="0" max="23">
+                    </div>
+                </div>
+                <input type="number" id="builderNumber" placeholder="Builder Number (1-6)">
+                <button onclick="addBuilderUpgrade()">Add Builder Upgrade</button>
+            </div>
+            <div id="builderUpgradesList"></div>
+        </div>
+
+        <div id="laboratory" class="tab-content">
+            <div class="input-group">
+                <input type="text" id="labName" placeholder="Research Name (e.g., Barbarian)">
+                <div class="duration-group">
+                    <div class="duration-input">
+                        <input type="number" id="labDays" placeholder="Days" min="0">
+                    </div>
+                    <div class="duration-input">
+                        <input type="number" id="labHours" placeholder="Hours" min="0" max="23">
+                    </div>
+                </div>
+                <button onclick="addLabUpgrade()">Add Laboratory Research</button>
+            </div>
+            <div id="labUpgradesList"></div>
+        </div>
+
+        <div id="planned" class="tab-content">
+            <div class="input-group">
+                <input type="text" id="plannedName" placeholder="Upgrade Name">
+                <select id="plannedType">
+                    <option value="builder">Builder Upgrade</option>
+                    <option value="lab">Laboratory Research</option>
+                </select>
+                <div class="duration-group">
+                    <div class="duration-input">
+                        <input type="number" id="plannedDays" placeholder="Days" min="0">
+                    </div>
+                    <div class="duration-input">
+                        <input type="number" id="plannedHours" placeholder="Hours" min="0" max="23">
+                    </div>
+                </div>
+                <input type="number" id="plannedBuilder" placeholder="Builder Number (if builder upgrade)">
+                <select id="plannedPriority">
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
+                <input type="number" id="goldCost" placeholder="Gold Cost">
+                <input type="number" id="elixirCost" placeholder="Elixir Cost">
+                <input type="number" id="darkElixirCost" placeholder="Dark Elixir Cost">
+                <button onclick="addPlannedUpgrade()">Add to Plan</button>
+            </div>
+            <div id="plannedUpgradesList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize storage
+        let builderUpgrades = JSON.parse(localStorage.getItem('builderUpgrades') || '[]');
+        let labUpgrades = JSON.parse(localStorage.getItem('labUpgrades') || '[]');
+        let plannedUpgrades = JSON.parse(localStorage.getItem('plannedUpgrades') || '[]');
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        function saveToLocalStorage() {
+            localStorage.setItem('builderUpgrades', JSON.stringify(builderUpgrades));
+            localStorage.setItem('labUpgrades', JSON.stringify(labUpgrades));
+            localStorage.setItem('plannedUpgrades', JSON.stringify(plannedUpgrades));
+        }
+
+        function calculateTotalHours(days, hours) {
+            return (parseInt(days || 0) * 24) + parseInt(hours || 0);
+        }
+
+        function formatTimeRemaining(total) {
+            const days = Math.floor(total / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let result = '';
+            if (days > 0) result += `${days}d `;
+            if (hours > 0) result += `${hours}h `;
+            result += `${minutes}m`;
+            return result;
+        }
+
+        function getTimeRemaining(endTime) {
+            const total = new Date(endTime) - new Date();
+            return formatTimeRemaining(total);
+        }
+
+        function addBuilderUpgrade() {
+            const name = document.getElementById('builderName').value;
+            const days = document.getElementById('builderDays').value;
+            const hours = document.getElementById('builderHours').value;
+            const builder = document.getElementById('builderNumber').value;
+
+            if (!name || (!days && !hours) || !builder) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const totalHours = calculateTotalHours(days, hours);
+            const startTime = new Date();
+            const endTime = new Date(startTime.getTime() + totalHours * 60 * 60 * 1000);
+
+            builderUpgrades.push({
+                id: Date.now(),
+                name,
+                duration: totalHours,
+                builder,
+                startTime,
+                endTime,
+                notificationsEnabled: true
+            });
+
+            builderUpgrades.sort((a, b) => new Date(a.endTime) - new Date(b.endTime));
+            saveToLocalStorage();
+            renderBuilderUpgrades();
+            
+            document.getElementById('builderName').value = '';
+            document.getElementById('builderDays').value = '';
+            document.getElementById('builderHours').value = '';
+            document.getElementById('builderNumber').value = '';
+        }
+
+        function addLabUpgrade() {
+            const name = document.getElementById('labName').value;
+            const days = document.getElementById('labDays').value;
+            const hours = document.getElementById('labHours').value;
+
+            if (!name || (!days && !hours)) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const totalHours = calculateTotalHours(days, hours);
+            const startTime = new Date();
+            const endTime = new Date(startTime.getTime() + totalHours * 60 * 60 * 1000);
+
+            labUpgrades.push({
+                id: Date.now(),
+                name,
+                duration: totalHours,
+                startTime,
+                endTime,
+                notificationsEnabled: true
+            });
+
+            labUpgrades.sort((a, b) => new Date(a.endTime) - new Date(b.endTime));
+            saveToLocalStorage();
+            renderLabUpgrades();
+            
+            document.getElementById('labName').value = '';
+            document.getElementById('labDays').value = '';
+            document.getElementById('labHours').value = '';
+        }
+
+        function addPlannedUpgrade() {
+            const name = document.getElementById('plannedName').value;
+            const type = document.getElementById('plannedType').value;
+            const days = document.getElementById('plannedDays').value;
+            const hours = document.getElementById('plannedHours').value;
+            const builder = document.getElementById('plannedBuilder').value;
+            const priority = document.getElementById('plannedPriority').value;
+            const goldCost = document.getElementById('goldCost').value;
+            const elixirCost = document.getElementById('elixirCost').value;
+            const darkElixirCost = document.getElementById('darkElixirCost').value;
+
+            if (!name || (!days && !hours)) {
+                alert('Please fill in at least the name and duration');
+                return;
+            }
+
+            const totalHours = calculateTotalHours(days, hours);
+
+            plannedUpgrades.push({
+                id: Date.now(),
+                name,
+                type,
+                duration: totalHours,
+                builder,
+                priority,
+                goldCost,
+                elixirCost,
+                darkElixirCost
+            });
+
+            saveToLocalStorage();
+            renderPlannedUpgrades();
+            
+            document.getElementById('plannedName').value = '';
+            document.getElementById('plannedDays').value = '';
+            document.getElementById('plannedHours').value = '';
+            document.getElementById('plannedBuilder').value = '';
+            document.getElementById('goldCost').value = '';
+            document.getElementById('elixirCost').value = '';
+            document.getElementById('darkElixirCost').value = '';
+        }
+
+        function renderBuilderUpgrades() {
+            const container = document.getElementById('builderUpgradesList');
+            container.innerHTML = builderUpgrades.map(upgrade => `
+                <div class="upgrade-card">
+                    <div class="title">${upgrade.name}</div>
+                    <div class="info">
+                        Builder ${upgrade.builder} • ${getTimeRemaining(upgrade.endTime)}
+                    </div>
+                    <div class="button-group">
+                        <button onclick="removeUpgrade('builder', ${upgrade.id})">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderLabUpgrades() {
+            const container = document.getElementById('labUpgradesList');
+            container.innerHTML = labUpgrades.map(upgrade => `
+                <div class="upgrade-card">
+                    <div class="title">${upgrade.name}</div>
+                    <div class="info">
+                        Completes in: ${getTimeRemaining(upgrade.endTime)}
+                    </div>
+                    <div class="button-group">
+                        <button onclick="removeUpgrade('lab', ${upgrade.id})">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPlannedUpgrades() {
+                const container = document.getElementById('plannedUpgradesList');
+                container.innerHTML = plannedUpgrades.map(upgrade => {
+                    const days = Math.floor(upgrade.duration / 24);
+                    const hours = upgrade.duration % 24;
+                    let durationText = '';
+                    if (days > 0) durationText += `${days}d `;
+                    if (hours > 0) durationText += `${hours}h`;
+                    
+                    return `
+                        <div class="upgrade-card">
+                            <div class="title">
+                                ${upgrade.name}
+                                <span class="priority-${upgrade.priority}">• ${upgrade.priority} priority</span>
+                            </div>
+                            <div class="info">
+                                ${upgrade.type === 'builder' ? 'Builder' : 'Laboratory'} • ${durationText}
+                                ${upgrade.goldCost ? `<br>Gold: ${upgrade.goldCost.toLocaleString()}` : ''}
+                                ${upgrade.elixirCost ? `<br>Elixir: ${upgrade.elixirCost.toLocaleString()}` : ''}
+                                ${upgrade.darkElixirCost ? `<br>Dark Elixir: ${upgrade.darkElixirCost.toLocaleString()}` : ''}
+                            </div>
+                            <div class="button-group">
+                                <button onclick="removeUpgrade('planned', ${upgrade.id})">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                                <button onclick="startUpgrade('${upgrade.type}', ${upgrade.id})">
+                                    <i class="fas fa-play"></i> Start
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function removeUpgrade(type, id) {
+                if (type === 'builder') {
+                    builderUpgrades = builderUpgrades.filter(u => u.id !== id);
+                    renderBuilderUpgrades();
+                } else if (type === 'lab') {
+                    labUpgrades = labUpgrades.filter(u => u.id !== id);
+                    renderLabUpgrades();
+                } else if (type === 'planned') {
+                    plannedUpgrades = plannedUpgrades.filter(u => u.id !== id);
+                    renderPlannedUpgrades();
+                }
+                saveToLocalStorage();
+            }
+
+            function startUpgrade(type, id) {
+                const planned = plannedUpgrades.find(u => u.id === id);
+                if (!planned) return;
+
+                if (type === 'builder') {
+                    addBuilderUpgrade();
+                } else if (type === 'lab') {
+                    addLabUpgrade();
+                }
+
+                removeUpgrade('planned', id);
+            }
+
+            // Initial render
+            renderBuilderUpgrades();
+            renderLabUpgrades();
+            renderPlannedUpgrades();
+
+            // Update times periodically
+            setInterval(() => {
+                renderBuilderUpgrades();
+                renderLabUpgrades();
+            }, 60000); // Update every minute
+        </script>
+    </body>
+</html>
